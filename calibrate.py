@@ -19,16 +19,31 @@ def calibrateCamera(projDim, cap):
 	print('Calibrating camera...')
 	time.sleep(1)
 	
-	transform = np.ndarray((3,3))
+	transform = None
 	while(True):
 		# Capture frame-by-frame
 		ret, frame = cap.read()
 		
 		# Our operations on the frame come here
 		
+		#convert to HSV color space to detect hue
+		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+		# define range of blue color in HSV
+		lowerGreen = np.array([45,60,60])
+		upperGreen = np.array([90,255,255])
+
+		# Threshold the HSV image to get only blue colors
+		mask = cv2.inRange(hsv, lowerGreen, upperGreen)
+		
+		## Bitwise-AND mask and original image
+		#res = cv2.bitwise_and(frame,frame, mask= mask)
+
+		
+		#cv.FindHomography(srcPoints, dstPoints, H, method=0, ransacReprojThreshold=3.0, status=None) 
 		
 		# Display the resulting frame
-		cv2.imshow('Calibrating...',out)
+		cv2.imshow('Calibrating...',mask)
+		#cv2.imshow('Calibrating...',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
