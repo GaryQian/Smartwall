@@ -27,7 +27,7 @@ def calibrateCamera(projDim, cap):
 	cv2.imshow('Calibrating...',out)
 	cv2.waitKey(100)
 	wait = raw_input('Press enter/return to continue...')
-	print('Calibrating camera...')
+	print('Calibrating camera. Move calibration image to projector.')
 	time.sleep(1)
 	
 	transform = None
@@ -94,8 +94,8 @@ def calibrateCamera(projDim, cap):
 		#cv2.imshow('Calibrating...',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-		if (len(detectedPoints) > len(points) * 0.5):
-			transform = cv2.findHomography(np.array(detectedPoints), np.array(points), method=0, ransacReprojThreshold=3.0) 
+		if (len(detectedPoints) > len(points) * 0.5 and len(detectedPoints) > 4):
+			transform = cv2.findHomography(np.array(detectedPoints), np.array(points), method=cv2.RANSAC, ransacReprojThreshold=3.0) 
 			break
 		elif (attempts > 150):
 			print('Failed to calibrate. Please relaunch and try again.')
@@ -107,7 +107,7 @@ def calibrateCamera(projDim, cap):
 	# When everything done, release the capture
 	cap.release()
 	cv2.destroyAllWindows()
-	
+	print('Found transform successfully!')
 	return transform
 	
 '''def collapse(img):
