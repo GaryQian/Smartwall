@@ -48,7 +48,7 @@ def calibrateCamera(projDim, cap):
 		# define range of blue color in HSV
 		#lowerColor = np.array([30,60,60])
 		#upperColor = np.array([110,255,255])
-		lowerColor = np.array([40,150,50])
+		lowerColor = np.array([40,50,50])
 		upperColor = np.array([90,255,255])
 		
 		# Threshold the HSV image to get only blue colors
@@ -67,13 +67,13 @@ def calibrateCamera(projDim, cap):
 		for c in cnts:
 			# compute the center of the contour
 			M = cv2.moments(c)
-			if (M["m00"] == 0):
-				cX = 0
-				cY = 0
-			else:
+			if (M["m00"] != 0):
 				cX = int(M["m10"] / M["m00"])
 				cY = int(M["m01"] / M["m00"])
+			else:
+				continue
 			cont = True
+			#check if the point is not right next to another
 			for pt in detectedPoints:
 				if abs(pt[0] - cY) + abs(pt[1] - cX) < 40:
 					cont = False
@@ -82,22 +82,19 @@ def calibrateCamera(projDim, cap):
 				detectedPoints.append((cY,cX))
 				cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
 				cv2.circle(frame, (cX, cY), 7, (255, 255, 255), -1)
+				cv2.putText(frame, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 			# draw the contour and center of the shape on the image
 			
-			#cv2.putText(frame, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+			#
 		
 		print len(detectedPoints)
-		#out = np.ndarray(frame.shape, np.float32)
-		#for pt in detectedPoints:
-		#	out[pt[0]][pt[1]] = [255, 255, 255]
-		#cv2.FindHomography(srcPoints, dstPoints, H, method=0, ransacReprojThreshold=3.0, status=None) 
 		
 		# Display the resulting frame
 		cv2.imshow('Calibrating...',frame)
 		#cv2.imshow('Calibrating...',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-		if (len(detectedPoints) > len(points) * 0.6):
+		if (len(detectedPoints) > len(points) * 0.5):
 			transform = cv2.findHomography(np.array(detectedPoints), np.array(points), method=0, ransacReprojThreshold=3.0) 
 			break
 		elif (attempts > 150):
