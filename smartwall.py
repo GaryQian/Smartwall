@@ -4,8 +4,8 @@ import cv2
 from calibrate import calibrateCamera
 	
 #Projector dimensions
-projH = 900
-projW = 640
+projH = 720
+projW = 1280
 
 cap = cv2.VideoCapture(0)
 
