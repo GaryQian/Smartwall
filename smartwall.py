@@ -8,8 +8,8 @@ projW = 1920
 projH = 1080
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
-transform = calibrateCamera((projH, projW), cap)
+transform, detectedPoints = calibrateCamera((projH, projW), cap)
 
 display((projH, projW), cap, transform)

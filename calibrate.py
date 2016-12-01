@@ -7,9 +7,9 @@ import sys
 def calibrateCamera(projDim, cap):
 	points = [(projDim[0] * .5, projDim[1] * .5),
 	(projDim[0] * .1, projDim[1] * .1),
-	(projDim[0] * .1, projDim[1] * .9),
-	(projDim[0] * .9, projDim[1] * .1),
-	(projDim[0] * .9, projDim[1] * .9),
+	(projDim[0] * .1, projDim[1] * .85),
+	(projDim[0] * .85, projDim[1] * .1),
+	(projDim[0] * .85, projDim[1] * .85),
 	(projDim[0] * .5, projDim[1] * .75),
 	(projDim[0] * .5, projDim[1] * .25),
 	(projDim[0] * .75, projDim[1] * .5),
@@ -21,7 +21,7 @@ def calibrateCamera(projDim, cap):
 	out = np.ndarray((projDim[1], projDim[1], 3), np.float32)
 	out[:,:,:] = 0
 	for point in points:
-		cv2.circle(out, (int(point[1]), int(point[0])), projDim[1] / 30, (0, 255, 0), thickness=-1)
+		cv2.circle(out, (int(point[1]), int(point[0])), projDim[1] / 25, (0, 255, 0), thickness=-1)
 	# Display the resulting frame
 	#print('Set up projector. Press any key to continue.')
 	cv2.imshow('Calibrating...',out)
@@ -31,7 +31,7 @@ def calibrateCamera(projDim, cap):
 	time.sleep(1)
 	
 	transform = None
-	kernel = np.ones((4,4),np.uint8)
+	erode = np.ones((3,3),np.uint8)
 	blurRad = 11
 	boxblur = np.ones((blurRad,blurRad),np.float32) / (blurRad * blurRad)
 	attempts = 0
@@ -48,7 +48,7 @@ def calibrateCamera(projDim, cap):
 		# define range of blue color in HSV
 		#lowerColor = np.array([30,60,60])
 		#upperColor = np.array([110,255,255])
-		lowerColor = np.array([40,50,50])
+		lowerColor = np.array([40,50,70])
 		upperColor = np.array([90,255,255])
 		
 		# Threshold the HSV image to get only blue colors
@@ -58,7 +58,7 @@ def calibrateCamera(projDim, cap):
 		#res = cv2.bitwise_and(frame,frame, mask= mask)
 
 		#erode to remove noise
-		#mask = cv2.erode(mask, kernel,iterations = 1)
+		mask = cv2.erode(mask, erode,iterations = 1)
 		
 		detectedPoints = []
 		
@@ -75,7 +75,7 @@ def calibrateCamera(projDim, cap):
 			cont = True
 			#check if the point is not right next to another
 			for pt in detectedPoints:
-				if abs(pt[0] - cY) + abs(pt[1] - cX) < 40:
+				if abs(pt[0] - cY) + abs(pt[1] - cX) < 30:
 					cont = False
 					break
 			if cont:
@@ -94,27 +94,17 @@ def calibrateCamera(projDim, cap):
 		#cv2.imshow('Calibrating...',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-		if (len(detectedPoints) > len(points) * 0.5 and len(detectedPoints) > 4):
+		if (len(detectedPoints) == len(points) and len(detectedPoints) >= 4):
 			transform = cv2.findHomography(np.array(detectedPoints), np.array(points), method=cv2.RANSAC, ransacReprojThreshold=3.0) 
 			break
-		elif (attempts > 150):
+		elif (attempts > 13350):
 			print('Failed to calibrate. Please relaunch and try again.')
-			cap.release()
 			cv2.destroyAllWindows()
 			sys.exit()
 			break
 
 	# When everything done, release the capture
-	cap.release()
 	cv2.destroyAllWindows()
 	print('Found transform successfully!')
-	return transform
-	
-'''def collapse(img):
-	h, w = img.shape
-	points = []
-	for i in range(h):
-		for j in range(w):
-			if (img[i][j] > 100):
-	'''			
+	return transform, detectedPoints
 				
