@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 
 from calibrate import calibrateCamera
+from display import display
 	
 #Projector dimensions
 projW = 1920
@@ -12,4 +13,4 @@ cap = cv2.VideoCapture(1)
 
 transform, detectedPoints = calibrateCamera((projH, projW), cap)
 
-display((projH, projW), cap, transform)
+display((projH, projW), cap, transform, detectedPoints)

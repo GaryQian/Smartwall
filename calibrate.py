@@ -5,7 +5,7 @@ import imutils
 import sys
 
 def calibrateCamera(projDim, cap):
-	points = [(projDim[0] * .5, projDim[1] * .5),
+	'''points = [(projDim[0] * .5, projDim[1] * .5),
 	(projDim[0] * .1, projDim[1] * .1),
 	(projDim[0] * .1, projDim[1] * .85),
 	(projDim[0] * .85, projDim[1] * .1),
@@ -17,7 +17,16 @@ def calibrateCamera(projDim, cap):
 	(projDim[0] * .3, projDim[1] * .3),
 	(projDim[0] * .7, projDim[1] * .3),
 	(projDim[0] * .3, projDim[1] * .7),
-	(projDim[0] * .7, projDim[1] * .7)]
+	(projDim[0] * .7, projDim[1] * .7)]'''
+	points = [(projDim[0] * .1, projDim[1] * .1),
+	(projDim[0] * .4, projDim[1] * .2),
+	(projDim[0] * .2, projDim[1] * .3),
+	(projDim[0] * .5, projDim[1] * .4),
+	(projDim[0] * .3, projDim[1] * .5),
+	(projDim[0] * .6, projDim[1] * .6),
+	(projDim[0] * .4, projDim[1] * .7),
+	(projDim[0] * .7, projDim[1] * .8),
+	(projDim[0] * .9, projDim[1] * .9)]
 	out = np.ndarray((projDim[1], projDim[1], 3), np.float32)
 	out[:,:,:] = 0
 	for point in points:
@@ -90,11 +99,12 @@ def calibrateCamera(projDim, cap):
 		print len(detectedPoints)
 		
 		# Display the resulting frame
-		cv2.imshow('Calibrating...',frame)
+		cv2.imshow('Calibrating...',out)
 		#cv2.imshow('Calibrating...',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 		if (len(detectedPoints) == len(points) and len(detectedPoints) >= 4):
+			detectedPoints = sorted(detectedPoints, key=lambda pt: pt[1])
 			transform = cv2.findHomography(np.array(detectedPoints), np.array(points), method=cv2.RANSAC, ransacReprojThreshold=3.0) 
 			break
 		elif (attempts > 13350):
@@ -107,4 +117,11 @@ def calibrateCamera(projDim, cap):
 	cv2.destroyAllWindows()
 	print('Found transform successfully!')
 	return transform, detectedPoints
+	
+'''def sortPoints(det):
+	out = []
+	min = None
+	while len(det) > 0:
+		min = det[0]
+		for p in '''
 				
