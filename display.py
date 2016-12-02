@@ -7,6 +7,8 @@ import win32api
 
 def display(projDim, cap, transform, dp):
 	
+	manualOffset = (-6, -8)
+	
 	
 	erode = np.ones((3,3),np.uint8)
 	blurRad = 11
@@ -32,8 +34,8 @@ def display(projDim, cap, transform, dp):
 		# define range of blue color in HSV
 		#lowerColor = np.array([30,60,60])
 		#upperColor = np.array([110,255,255])
-		lowerColor = np.array([40,50,70])
-		upperColor = np.array([90,255,255])
+		lowerColor = np.array([40,60,70])
+		upperColor = np.array([85,255,255])
 		
 		# Threshold the HSV image to get only blue colors
 		mask = cv2.inRange(hsv, lowerColor, upperColor)
@@ -52,8 +54,8 @@ def display(projDim, cap, transform, dp):
 			# compute the center of the contour
 			M = cv2.moments(c)
 			if (M["m00"] != 0 and attempt > 10):
-				cX = int(M["m10"] / M["m00"])
-				cY = int(M["m01"] / M["m00"])
+				cX = int(M["m10"] / M["m00"]) - manualOffset[1]
+				cY = int(M["m01"] / M["m00"]) - manualOffset[0]
 			else:
 				continue
 			cont = True
@@ -63,28 +65,34 @@ def display(projDim, cap, transform, dp):
 					cont = False
 					break
 			if cont:
-				detectedPoints.append((cY,cX))
-				cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
-				cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
-				cv2.putText(frame, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+				p = np.dot(transform[0], [cY, cX, 1])
+				p = (p / p[2])
+				if (p[0] >= 0 and p[1] >= 0 and p[0] <= projDim[0] and p[1] <= projDim[1]):
+					detectedPoints.append((cY,cX))
+					#cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
+					#cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
+					#cv2.putText(frame, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 			# draw the contour and center of the shape on the image
 			
 			#
 		
-		print len(detectedPoints)
+		#print len(detectedPoints)
 		
 		
 		
 		for p in detectedPoints:
 			
-			p = np.dot(transform[0], [int(p[0]), int(p[1]), 1])
-			p = p / p[2]
-			cv2.circle(out, (int(p[1]), int(p[0])), projDim[1] / 120, (0, 0, 255), thickness=-1)
+			trans = np.dot(transform[0], [int(p[0]), int(p[1]), 1])
+			trans = (trans / trans[2])
+			cv2.circle(out, (int(trans[1]), int(trans[0])), projDim[1] / 120, (0, 0, 255), thickness=-1)
 			if (len(detectedPoints) == 1):
-				win32api.SetCursorPos((int(p[1]), int(p[0])))
+				win32api.SetCursorPos((int(trans[1]), int(trans[0])))
+				window = obtainWindow(frame, p, trans, projDim)
+				cv2.imshow('Smartwall',window)
+				print window.shape
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
 		# Display the resulting frame
-		cv2.imshow('Smartwall',frame)
+		#cv2.imshow('Smartwall',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
@@ -97,5 +105,10 @@ def erase(projDim):
 	out[:,:,:] = 0
 	return out
 	
-
+def obtainWindow(frame, p, trans, projDim):
+	windowScale = 3
+	windowFrame = 32 / 2 * windowScale
+	if (trans[0] >= 32 and trans[1] >= 32 and trans[0] <= projDim[0] - 32 and trans[1] <= projDim[1] - 32 and p[0] >= 32 and p[1] >= 32 and p[0] <= frame.shape[0] - 32 and p[1] <= frame.shape[1] - 32):
+		return frame[p[0] - windowFrame:p[0] + windowFrame:3,p[1] - windowFrame:p[1] + windowFrame:3]
+	return np.ndarray((32, 32, 3))
 	
