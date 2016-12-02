@@ -3,6 +3,7 @@ import cv2
 import time
 import imutils
 import sys
+import win32api
 
 def display(projDim, cap, transform, dp):
 	
@@ -73,13 +74,17 @@ def display(projDim, cap, transform, dp):
 		print len(detectedPoints)
 		
 		
+		
 		for p in detectedPoints:
+			
 			p = np.dot(transform[0], [int(p[0]), int(p[1]), 1])
 			p = p / p[2]
 			cv2.circle(out, (int(p[1]), int(p[0])), projDim[1] / 120, (0, 0, 255), thickness=-1)
+			if (len(detectedPoints) == 1):
+				win32api.SetCursorPos((int(p[1]), int(p[0])))
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
 		# Display the resulting frame
-		cv2.imshow('Smartwall',out)
+		cv2.imshow('Smartwall',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
@@ -87,7 +92,7 @@ def display(projDim, cap, transform, dp):
 	cap.release()
 	cv2.destroyAllWindows()
 
-def erase():
+def erase(projDim):
 	out = np.ndarray((projDim[0], projDim[1], 3), np.uint8)
 	out[:,:,:] = 0
 	return out

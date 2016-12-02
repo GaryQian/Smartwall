@@ -34,8 +34,8 @@ def calibrateCamera(projDim, cap):
 	# Display the resulting frame
 	#print('Set up projector. Press any key to continue.')
 	cv2.imshow('Calibrating...',out)
-	cv2.waitKey(100)
-	wait = raw_input('Press enter/return to continue...')
+	cv2.waitKey(1000)
+	#wait = raw_input('Press enter/return to continue...')
 	print('Calibrating camera. Move calibration image to projector.')
 	time.sleep(1)
 	
