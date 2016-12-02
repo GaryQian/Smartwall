@@ -6,9 +6,7 @@ import sys
 import win32api
 
 def display(projDim, cap, transform, dp):
-	
-	manualOffset = (-6, -8)
-	
+	manualOffset = (-6, 0)
 	
 	erode = np.ones((3,3),np.uint8)
 	blurRad = 11
@@ -70,7 +68,7 @@ def display(projDim, cap, transform, dp):
 				if (p[0] >= 0 and p[1] >= 0 and p[0] <= projDim[0] and p[1] <= projDim[1]):
 					detectedPoints.append((cY,cX))
 					#cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
-					#cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
+					cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
 					#cv2.putText(frame, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 			# draw the contour and center of the shape on the image
 			
@@ -90,6 +88,8 @@ def display(projDim, cap, transform, dp):
 				window = obtainWindow(frame, p, trans, projDim)
 				cv2.imshow('Smartwall',window)
 				print window.shape
+			else:
+				cv2.imshow('Smartwall',frame)
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
 		# Display the resulting frame
 		#cv2.imshow('Smartwall',frame)
@@ -106,9 +106,9 @@ def erase(projDim):
 	return out
 	
 def obtainWindow(frame, p, trans, projDim):
-	windowScale = 3
+	windowScale = 2
 	windowFrame = 32 / 2 * windowScale
 	if (trans[0] >= 32 and trans[1] >= 32 and trans[0] <= projDim[0] - 32 and trans[1] <= projDim[1] - 32 and p[0] >= 32 and p[1] >= 32 and p[0] <= frame.shape[0] - 32 and p[1] <= frame.shape[1] - 32):
-		return frame[p[0] - windowFrame:p[0] + windowFrame:3,p[1] - windowFrame:p[1] + windowFrame:3]
-	return np.ndarray((32, 32, 3))
+		return frame[p[0] - windowFrame:p[0] + windowFrame:windowScale,p[1] - windowFrame:p[1] + windowFrame:windowScale]
+	return np.zeros((32, 32, 3))
 	
