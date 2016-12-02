@@ -1,5 +1,6 @@
 import numpy as np
-import os
+from os import path
+from os import listdir
 from keras.datasets import cifar10
 from keras.models import Sequential
 from keras.layers import Dense
@@ -35,10 +36,14 @@ openHand = np.zeros(shape)			#np.array for open hand images
 closedHand = np.zeros(shape)		#np.array for closed hand images
 
 for x in range (0 to imNum0): #for each image in trainingData/0/*
-	temp = cv2.imread(prestring0 + x + postString)
-	for rgb in range (0 to 3):
-		openHand[x][rgb] = temp[:,:][rgb] #load it into openHand
-
+	fname = prestring0 + x + postString
+	if os.path.exists(fname):
+		temp = cv2.imread(fname)
+		for rgb in range (0 to 3):
+			openHand[x][rgb] = temp[:,:][rgb] #load it into openHand
+	else:
+		imNum0++
+	
 
 
 
