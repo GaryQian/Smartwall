@@ -14,4 +14,4 @@ cap = cv2.VideoCapture(1)
 
 transform, detectedPoints = calibrateCamera((projH, projW), cap)
 
-display((projH, projW), cap, transform, detectedPoints)
+display((projH, projW), cap, transform, detectedPoints) 
