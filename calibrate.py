@@ -117,11 +117,3 @@ def calibrateCamera(projDim, cap):
 	cv2.destroyAllWindows()
 	print('Found transform successfully!')
 	return transform, detectedPoints
-	
-'''def sortPoints(det):
-	out = []
-	min = None
-	while len(det) > 0:
-		min = det[0]
-		for p in '''
-				

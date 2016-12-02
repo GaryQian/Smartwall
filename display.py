@@ -10,8 +10,7 @@ def display(projDim, cap, transform, dp):
 	erode = np.ones((3,3),np.uint8)
 	blurRad = 11
 	boxblur = np.ones((blurRad,blurRad),np.float32) / (blurRad * blurRad)
-	out = np.ndarray((projDim[0], projDim[1], 3), np.uint8)
-	out[:,:,:] = 0
+	out = erase(projDim)
 	attempt = 0
 	while(True):
 		attempt += 1
@@ -88,5 +87,10 @@ def display(projDim, cap, transform, dp):
 	cap.release()
 	cv2.destroyAllWindows()
 
+def erase():
+	out = np.ndarray((projDim[0], projDim[1], 3), np.uint8)
+	out[:,:,:] = 0
+	return out
+	
 
 	
