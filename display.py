@@ -4,10 +4,11 @@ import time
 import imutils
 import sys
 import win32api
+import cPickle as pickle
 
 def display(projDim, cap, transform, dp):
 	manualOffset = (-6, 0)
-	
+	counter = pickle.load(open("counter.dat", "rb"))
 	erode = np.ones((3,3),np.uint8)
 	blurRad = 11
 	boxblur = np.ones((blurRad,blurRad),np.float32) / (blurRad * blurRad)
@@ -87,7 +88,11 @@ def display(projDim, cap, transform, dp):
 				win32api.SetCursorPos((int(trans[1]), int(trans[0])))
 				window = obtainWindow(frame, p, trans, projDim)
 				cv2.imshow('Smartwall',window)
-				print window.shape
+				if (attempt % 5 == 0):
+					cv2.imwrite('trainingData/1/img' + str(counter) + '.png', window)
+					print counter
+					counter += 1
+					pickle.dump(counter, open( "counter.dat", "wb" ))
 			else:
 				cv2.imshow('Smartwall',frame)
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
