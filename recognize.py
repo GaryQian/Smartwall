@@ -53,10 +53,6 @@ for x in range(0, imNum0): #for each image in trainingData/0/*
     y_train[count] = 0
 
     count += 1
-    # for rgb in range (0, 3):
-    # openHand[x][rgb] = temp[:,:][rgb] #load it into openHand
-
-print(X_train.shape)
 
 for x in range(0, imNum1): #for each image in trainingData/0/*
   fname = prestring1 + str(x) + postString
@@ -66,16 +62,21 @@ for x in range(0, imNum1): #for each image in trainingData/0/*
     y_train[count] = 1
 
     count += 1
-    # for rgb in range (0, 3):
-    # openHand[x][rgb] = temp[:,:][rgb] #load it into openHand
 
 X_train = X_train[:count]
+y_train = y_train[:count]
+# normalize inputs from 0-255 to 0.0-1.0
+X_train = X_train.astype('float32')
+X_train = X_train / 255.0
 
 
+# one hot encode outputs
+y_train = y_train.reshape((-1, 1))
+#y_train = np_utils.to_categorical(y_train)
 
 # Create the model
 model = Sequential()
-model.add(Convolution2D(32, 3, 3, input_shape=(3, 32, 32), border_mode='same', activation='relu', W_constraint=maxnorm(3)))
+model.add(Convolution2D(32, 3, 3, input_shape=(32, 32, 3), border_mode='same', activation='relu', W_constraint=maxnorm(3)))
 model.add(Dropout(0.2))
 model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', W_constraint=maxnorm(3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -88,14 +89,17 @@ epochs = 25
 lrate = 0.01
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
-model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 print(model.summary())
 
-print(X_train.shape)
 
 
 # Fit the model
-model.fit(X_train, y_train, validation_data=(X_train, y_train), nb_epoch=epochs, batch_size=32)
+#for i in range(len(X_train)):
+model.fit(X_train, y_train, batch_size=32, nb_epoch=epochs, verbose=1, callbacks=[], validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None)
+#model.fit(X_train, y_train, validation_data=(X_train, y_train), nb_epoch=epochs, batch_size=32)
+
+print predict_proba(X_train[930:1000], batch_size=32, verbose=1)
 """
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
