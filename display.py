@@ -90,7 +90,7 @@ def display(projDim, cap, transform, dp):
 				win32api.SetCursorPos((int(trans[1]), int(trans[0])))
 				window = obtainWindow(frame, p, trans, projDim)
 				cv2.imshow('Smartwall',window)
-				if (!training and img != None):
+				if (not training and img != None):
 					#Use deep learning predict
 					prob = model.predict(window, batch_size=10, verbose=1)
 					pastGestures.append(prob[0])
@@ -102,9 +102,11 @@ def display(projDim, cap, transform, dp):
 							win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
 						else:
 							#Nothing
+							x = x
 					else:
 						if (currentGesture == 1):
 							#Nothing
+							x = x
 						else:
 							currentGesture = 1
 							win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
