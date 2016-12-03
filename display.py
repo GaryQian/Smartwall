@@ -5,15 +5,28 @@ import imutils
 import sys
 import win32api
 import cPickle as pickle
+from collections import deque
+
+from keras.models import Sequential
 
 def display(projDim, cap, transform, dp):
+	training = False
 	manualOffset = (-6, 0)
 	counter = pickle.load(open("counter.dat", "rb"))
+	
 	erode = np.ones((3,3),np.uint8)
 	blurRad = 11
 	boxblur = np.ones((blurRad,blurRad),np.float32) / (blurRad * blurRad)
 	out = erase(projDim)
 	attempt = 0
+	
+	###################
+	#Deep learing vars#
+	###################
+	model = pickle.load(open("model1.dat", "rb"))
+	pastGestures = deque([0, 0, 0, 0, 0])
+	currentGesture = 0
+	###################
 	while(True):
 		attempt += 1
 	
@@ -23,16 +36,12 @@ def display(projDim, cap, transform, dp):
 		
 		# Our operations on the frame come here
 		
-		
-		
 		# Our operations on the frame come here
 		frameBlur = cv2.filter2D(frame, -1, boxblur)
 		
 		#convert to HSV color space to detect hue
 		hsv = cv2.cvtColor(frameBlur, cv2.COLOR_BGR2HSV)
-		# define range of blue color in HSV
-		#lowerColor = np.array([30,60,60])
-		#upperColor = np.array([110,255,255])
+		# define range of green color in HSV
 		lowerColor = np.array([40,60,70])
 		upperColor = np.array([85,255,255])
 		
@@ -71,13 +80,6 @@ def display(projDim, cap, transform, dp):
 					#cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
 					cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
 					#cv2.putText(frame, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
-			# draw the contour and center of the shape on the image
-			
-			#
-		
-		#print len(detectedPoints)
-		
-		
 		
 		for p in detectedPoints:
 			
@@ -88,14 +90,35 @@ def display(projDim, cap, transform, dp):
 				win32api.SetCursorPos((int(trans[1]), int(trans[0])))
 				window = obtainWindow(frame, p, trans, projDim)
 				cv2.imshow('Smartwall',window)
-				if (attempt % 5 == 0):
-					cv2.imwrite('trainingData/1/img' + str(counter) + '.png', window)
-					print counter
-					counter += 1
-					pickle.dump(counter, open( "counter.dat", "wb" ))
+				if (!training and img != None):
+					#Use deep learning predict
+					prob = model.predict(window, batch_size=10, verbose=1)
+					pastGestures.append(prob[0])
+					pastGestures.popleft()
+					temp = currentGesture
+					if (pastGestures.count(0) >= 3):
+						if (currentGesture == 1):
+							currentGesture = 0
+							win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
+						else:
+							#Nothing
+					else:
+						if (currentGesture == 1):
+							#Nothing
+						else:
+							currentGesture = 1
+							win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
+				elif (img != None):
+					#Write training data
+					if (attempt % 5 == 0):
+						cv2.imwrite('trainingData/1/img' + str(counter) + '.png', window)
+						print counter
+						counter += 1
+						pickle.dump(counter, open( "counter.dat", "wb" ))
 			else:
 				cv2.imshow('Smartwall',frame)
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
+		
 		# Display the resulting frame
 		#cv2.imshow('Smartwall',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -115,5 +138,5 @@ def obtainWindow(frame, p, trans, projDim):
 	windowFrame = 32 / 2 * windowScale
 	if (trans[0] >= 32 and trans[1] >= 32 and trans[0] <= projDim[0] - 32 and trans[1] <= projDim[1] - 32 and p[0] >= 32 and p[1] >= 32 and p[0] <= frame.shape[0] - 32 and p[1] <= frame.shape[1] - 32):
 		return frame[p[0] - windowFrame:p[0] + windowFrame:windowScale,p[1] - windowFrame:p[1] + windowFrame:windowScale]
-	return np.zeros((32, 32, 3))
+	return None
 	
