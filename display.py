@@ -26,7 +26,7 @@ def display(projDim, cap, transform, dp):
 	###################
 	#Deep learing vars#
 	###################
-	model = load_model('model1.dat')
+	model = load_model('model2deep.dat')
 	pastGestures = deque([0, 0, 0, 0, 0])
 	currentGesture = 0
 	###################
@@ -98,7 +98,7 @@ def display(projDim, cap, transform, dp):
 					#Use deep learning predict
 					imgs = np.ndarray((1, 32, 32, 3))
 					imgs[0] = window
-					prob = model.predict_proba(imgs, batch_size=10, verbose=1)
+					prob = model.predict_proba(imgs, batch_size=10, verbose=0)
 					prediction = 0
 					if (prob[0][1] > prob[0][0]):
 						prediction = 1

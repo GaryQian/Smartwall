@@ -76,7 +76,8 @@ y_train = y_train.reshape((-1, 1))
 #y_train = np_utils.to_categorical(y_train)
 
 # Create the model
-model = Sequential()
+#shallow model
+'''model = Sequential()
 model.add(Convolution2D(32, 3, 3, input_shape=(32, 32, 3), border_mode='same', activation='relu', W_constraint=maxnorm(3)))
 model.add(Dropout(0.2))
 model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', W_constraint=maxnorm(3)))
@@ -84,9 +85,32 @@ model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Flatten())
 model.add(Dense(512, activation='relu', W_constraint=maxnorm(3)))
 model.add(Dropout(0.5))
+model.add(Dense(num_classes, activation='softmax'))'''
+
+#deeper model
+model = Sequential()
+model.add(Convolution2D(32, 3, 3, input_shape=(32, 32, 3), activation='relu', border_mode='same'))
+model.add(Dropout(0.2))
+model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2, 1)))
+model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same'))
+model.add(Dropout(0.2))
+model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2, 1)))
+model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
+model.add(Dropout(0.2))
+model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2, 1)))
+model.add(Flatten())
+model.add(Dropout(0.2))
+model.add(Dense(1024, activation='relu', W_constraint=maxnorm(3)))
+model.add(Dropout(0.2))
+model.add(Dense(512, activation='relu', W_constraint=maxnorm(3)))
+model.add(Dropout(0.2))
 model.add(Dense(num_classes, activation='softmax'))
+
 # Compile model
-epochs = 25
+epochs = 100
 lrate = 0.01
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
@@ -99,7 +123,7 @@ print(model.summary())
 #for i in range(len(X_train)):
 model.fit(X_train, y_train, batch_size=32, nb_epoch=epochs, verbose=1, callbacks=[], validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None)
 #model.fit(X_train, y_train, validation_data=(X_train, y_train), nb_epoch=epochs, batch_size=32)
-model.save('model1.dat')
+model.save('model2deep.dat')
 
 print model.predict_proba(X_train[930:1000], batch_size=32, verbose=1)
 """
