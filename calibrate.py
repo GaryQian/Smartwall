@@ -18,15 +18,15 @@ def calibrateCamera(projDim, cap):
 	(projDim[0] * .7, projDim[1] * .3),
 	(projDim[0] * .3, projDim[1] * .7),
 	(projDim[0] * .7, projDim[1] * .7)]'''
-	points = [(projDim[0] * .1, projDim[1] * .1),
-	(projDim[0] * .4, projDim[1] * .2),
-	(projDim[0] * .2, projDim[1] * .3),
-	(projDim[0] * .5, projDim[1] * .4),
-	(projDim[0] * .3, projDim[1] * .5),
-	(projDim[0] * .6, projDim[1] * .6),
-	(projDim[0] * .4, projDim[1] * .7),
-	(projDim[0] * .7, projDim[1] * .8),
-	(projDim[0] * .9, projDim[1] * .9)]
+	points = [(projDim[0] * .9, projDim[1] * .1),
+	(projDim[0] * .1, projDim[1] * .2),
+	(projDim[0] * .7, projDim[1] * .3),
+	(projDim[0] * .3, projDim[1] * .4),
+	(projDim[0] * .5, projDim[1] * .5),
+	(projDim[0] * .7, projDim[1] * .6),
+	(projDim[0] * .3, projDim[1] * .7),
+	(projDim[0] * .9, projDim[1] * .8),
+	(projDim[0] * .1, projDim[1] * .9)]
 	out = np.ndarray((projDim[1], projDim[1], 3), np.float32)
 	out[:,:,:] = 0
 	for point in points:

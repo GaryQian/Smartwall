@@ -92,7 +92,8 @@ def display(projDim, cap, transform, dp):
 			if (len(detectedPoints) == 1):
 				win32api.SetCursorPos((int(trans[1]), int(trans[0])))
 				window = obtainWindow(frame, p, trans, projDim)
-				#cv2.imshow('Smartwall',window)
+				if window != None:
+					cv2.imshow('Smartwall',window)
 				if (not training and window != None):
 					#Use deep learning predict
 					imgs = np.ndarray((1, 32, 32, 3))
@@ -101,6 +102,7 @@ def display(projDim, cap, transform, dp):
 					prediction = 0
 					if (prob[0][1] > prob[0][0]):
 						prediction = 1
+					print prediction
 					pastGestures.append(prediction)
 					pastGestures.popleft()
 					temp = currentGesture
@@ -130,8 +132,8 @@ def display(projDim, cap, transform, dp):
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
 		
 		# Display the resulting frame
-		print frame.shape
-		cv2.imshow('Smartwall',frame)
+		#print frame.shape
+		#cv2.imshow('Smartwall',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
