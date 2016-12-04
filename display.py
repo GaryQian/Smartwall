@@ -12,7 +12,7 @@ from keras.models import load_model
 from keras.models import Sequential
 
 def display(projDim, cap, transform, dp):
-	training = False
+	training = True
 	manualOffset = (-6, 0)
 	counter = pickle.load(open("counter.dat", "rb"))
 	
@@ -26,7 +26,7 @@ def display(projDim, cap, transform, dp):
 	###################
 	#Deep learing vars#
 	###################
-	model = load_model('model2deep.dat')
+	model = load_model('model3deep.dat')
 	pastGestures = deque([0, 0, 0, 0, 0])
 	currentGesture = 0
 	###################
@@ -123,7 +123,7 @@ def display(projDim, cap, transform, dp):
 				elif (window != None):
 					#Write training data
 					if (attempt % 5 == 0):
-						cv2.imwrite('trainingData/1/img' + str(counter) + '.png', window)
+						cv2.imwrite('trainingData2/0/img' + str(counter) + '.png', window)
 						print counter
 						counter += 1
 						pickle.dump(counter, open( "counter.dat", "wb" ))

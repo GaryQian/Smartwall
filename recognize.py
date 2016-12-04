@@ -12,6 +12,7 @@ from keras.constraints import maxnorm
 from keras.optimizers import SGD
 from keras.layers.convolutional import Convolution2D
 from keras.layers.convolutional import MaxPooling2D
+from keras.models import load_model
 from keras.utils import np_utils
 from keras import backend as K
 
@@ -28,8 +29,8 @@ seed = 7
 np.random.seed(seed)
 
 # Load training data
-prestring0 = 'trainingData/0/img' #x.png for open hand
-prestring1 = 'trainingData/1/img' #x.png for closed hand
+prestring0 = 'trainingData2/0/img' #x.png for open hand
+prestring1 = 'trainingData2/1/img' #x.png for closed hand
 #prestring2 = 'trainingData/2/img' #x.png
 #prestring3 = 'trainingData/3/img' #x.png
 postString = '.png'
@@ -87,7 +88,7 @@ model.add(Dense(512, activation='relu', W_constraint=maxnorm(3)))
 model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))'''
 
-#deeper model
+'''#deeper model
 model = Sequential()
 model.add(Convolution2D(32, 3, 3, input_shape=(32, 32, 3), activation='relu', border_mode='same'))
 model.add(Dropout(0.2))
@@ -107,7 +108,9 @@ model.add(Dense(1024, activation='relu', W_constraint=maxnorm(3)))
 model.add(Dropout(0.2))
 model.add(Dense(512, activation='relu', W_constraint=maxnorm(3)))
 model.add(Dropout(0.2))
-model.add(Dense(num_classes, activation='softmax'))
+model.add(Dense(num_classes, activation='softmax'))'''
+
+model = load_model('model2deep.dat')
 
 # Compile model
 epochs = 100
@@ -123,7 +126,7 @@ print(model.summary())
 #for i in range(len(X_train)):
 model.fit(X_train, y_train, batch_size=32, nb_epoch=epochs, verbose=1, callbacks=[], validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None)
 #model.fit(X_train, y_train, validation_data=(X_train, y_train), nb_epoch=epochs, batch_size=32)
-model.save('model2deep.dat')
+model.save('model3deep.dat')
 
 print model.predict_proba(X_train[930:1000], batch_size=32, verbose=1)
 """
