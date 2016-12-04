@@ -4,8 +4,10 @@ import time
 import imutils
 import sys
 import win32api
+import win32con
 import cPickle as pickle
 from collections import deque
+from keras.models import load_model
 
 from keras.models import Sequential
 
@@ -15,15 +17,16 @@ def display(projDim, cap, transform, dp):
 	counter = pickle.load(open("counter.dat", "rb"))
 	
 	erode = np.ones((3,3),np.uint8)
-	blurRad = 11
+	blurRad = 9
 	boxblur = np.ones((blurRad,blurRad),np.float32) / (blurRad * blurRad)
 	out = erase(projDim)
 	attempt = 0
+	x = 0
 	
 	###################
 	#Deep learing vars#
 	###################
-	model = pickle.load(open("model1.dat", "rb"))
+	model = load_model('model1.dat')
 	pastGestures = deque([0, 0, 0, 0, 0])
 	currentGesture = 0
 	###################
@@ -89,11 +92,16 @@ def display(projDim, cap, transform, dp):
 			if (len(detectedPoints) == 1):
 				win32api.SetCursorPos((int(trans[1]), int(trans[0])))
 				window = obtainWindow(frame, p, trans, projDim)
-				cv2.imshow('Smartwall',window)
-				if (not training and img != None):
+				#cv2.imshow('Smartwall',window)
+				if (not training and window != None):
 					#Use deep learning predict
-					prob = model.predict(window, batch_size=10, verbose=1)
-					pastGestures.append(prob[0])
+					imgs = np.ndarray((1, 32, 32, 3))
+					imgs[0] = window
+					prob = model.predict_proba(imgs, batch_size=10, verbose=1)
+					prediction = 0
+					if (prob[0][1] > prob[0][0]):
+						prediction = 1
+					pastGestures.append(prediction)
 					pastGestures.popleft()
 					temp = currentGesture
 					if (pastGestures.count(0) >= 3):
@@ -110,7 +118,7 @@ def display(projDim, cap, transform, dp):
 						else:
 							currentGesture = 1
 							win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
-				elif (img != None):
+				elif (window != None):
 					#Write training data
 					if (attempt % 5 == 0):
 						cv2.imwrite('trainingData/1/img' + str(counter) + '.png', window)
@@ -122,7 +130,8 @@ def display(projDim, cap, transform, dp):
 		out[0:fh/2,0:fw/2,] = frame[::2,::2]
 		
 		# Display the resulting frame
-		#cv2.imshow('Smartwall',frame)
+		print frame.shape
+		cv2.imshow('Smartwall',frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 

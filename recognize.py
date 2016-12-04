@@ -99,7 +99,8 @@ print(model.summary())
 #for i in range(len(X_train)):
 model.fit(X_train, y_train, batch_size=32, nb_epoch=epochs, verbose=1, callbacks=[], validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None)
 #model.fit(X_train, y_train, validation_data=(X_train, y_train), nb_epoch=epochs, batch_size=32)
-pickle.dump(model, open( "model1.dat", "wb" ))
+model.save('model1.dat')
+
 print model.predict_proba(X_train[930:1000], batch_size=32, verbose=1)
 """
 # Final evaluation of the model
