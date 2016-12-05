@@ -70,7 +70,7 @@
 \posttitle{\end{center}} % Article title closing formatting
 \title{SmartWall} % Article title
 \author{%
-\textsc{Gary Qian, Manyu Sharma, Tony Jiang, Sarah Sukardi}\\[1ex] % Your name
+\textsc{Gary Qian, Manyu Sharma, Sarah Sukardi, Tony Jiang}\\[1ex] % Your name
 \normalsize Johns Hopkins University, Department of Computer Science \\ % Your institution
 %\normalsize \href{mailto:john@smith.com}{john@smith.com} % Your email address
 %\and % Uncomment if 2 authors are required, duplicate these 4 lines if more
@@ -101,11 +101,10 @@ This paper presents Smartwall, a program that uses computer vision to turn any s
 
 \section{Introduction}
 
-\lettrine[nindent=0em,lines=3]{H} umans have drawn on surfaces for millenia. From primitive pre-historic cave paintings to 17th century frescoes to the chalkboards and whiteboards commonly used in schools and universities today, the usage of surfaces as conduits for brainstorming, depicting information, and even art, have made them long essential to processes of creativity and conveyance.\\ \\Current, modern approaches to drawing on surfaces suffer from either requiring physical media (whiteboards, chalkboards, pens) or expensive equipment (modern-day smartboards). This paper presents a cost-effective method to turn any wall into a drawable surface using only two pieces of equipment: a camera and a projector, where the projector can be substituted with any medium capable of displaying digital content (ie. televisions, monitors, etc.). \\ \\ Our method is easily adaptable to spaces with unique constraints and requires equipment that most modern rooms already come equipped with, combining both traditional as well as state-of-the art computer vision techniques to allow for sophisticated and accurate gestural recognition.
+\lettrine[nindent=0em,lines=3]{H} umans have drawn on surfaces for millenia. From primitive pre-historic cave paintings to 17th century frescoes to the chalkboards and whiteboards commonly used in schools and universities today, the usage of surfaces as conduits for brainstorming, depicting information, and even art, have made them long essential to processes of creativity and conveyance.\\ \\Current, modern approaches to drawing on surfaces suffer from either requiring physical, depletable media (whiteboards, chalkboards, pens, paint) or expensive equipment (modern-day smartboards). This paper presents a cost-effective method to turn any wall into a drawable surface using only two pieces of equipment: a camera and a projector, where the projector can be substituted with any medium capable of displaying digital content (ie. televisions, monitors, etc.). \\ \\ Our method is easily adaptable to spaces with unique constraints and requires equipment that most modern rooms already come equipped with, combining both traditional as well as state-of-the art computer vision techniques to allow for sophisticated and accurate gestural recognition.
 %------------------------------------------------
 \section{Methods}
 
-\subsection{Overview}
 We separate our discussion of methods into several subsections:
 \begin{itemize}
 \item Calibration
@@ -116,19 +115,23 @@ We separate our discussion of methods into several subsections:
 \end{itemize}
 \subsection{Calibration}
 For camera calibration, the camera used to track hand movement is set to point towards the wall. The projector also projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin.\\ \\
-The camera then begins the process of calibration. Frames are captured in real-time from the camera, and then applied with a box blur with an 11-pixel radius. Each frame is then converted to HSV color-space to detect hues on the screen. The range of color to be detected is then defined in HSV and thresholded to retrieve only the desired values. Finally, the thresholded mask is eroded to remove noise.\\ \\
-From each processed frame, contours are drawn and the center of each contour is computed, with nearby pixels within a 30-pixel radius clustered to form a single point. The amount of detected points is then gathered from the image. \\ \\
+The camera then begins the process of calibration. Frames are captured in real-time from the camera, and then a box blur with an 11-pixel radius is applied to the image. Each frame is then converted to HSV color-space to detect hues on the screen. The range of color to be detected is then defined in HSV and thresholded to retrieve only the desired values. Finally, the thresholded mask is eroded to remove noise.\\ \\
+From each processed frame, contours are drawn and the center of each contour is computed, with any nearby pixels within a 30-pixel radius clustered to form a single point. The amount of detected points is then gathered from the image. \\ \\
 When the amount of detected points is equal to the amount of points on the custom pattern designed for optimum calibration, the points are sorted and then a homography is found to output a transformation matrix. If the pattern is not adequately detected, the system continues again for up to 13350 iterations.\\ \\
-We have found that our system accurately detects our custom pattern projected onto a flat white background in less than 10 iterations, or frames, even with the camera positioned at various angles.\footnote{Example footnote}.
+We have found that our system accurately detects our custom pattern projected onto a flat white background in less than 10 iterations, or frames, even with the camera positioned at various angles.\footnote{Source code in provided file \textbf{calibrate.py}.}.
 
 \subsection{Detection}
-For successful object detection by the camera, 
+After camera calibration has occurred, the program switches into real-time capture mode for object detection. After a frame captured real-time is converted to HSV, thresholded, eroded, contoured, and filtered to remove unwanted detections (similar to the rudimentary algorithm used for initial object detection), the colored point detected is transformed using the projective transformation found during the process of camera calibration to find the corresponding location on the screen.\\ \\ Once the location of the detected point in both camera and world coordinates has been found, a point can be directly output onto the screen in the location of the detected point, or the point can be sent for further processing and image recognition. \footnote{Source code in provided file \textbf{display.py}}
 
 \subsection{Training}
-Training for subsequent object recognition was performed using the Keras library for Python. Over 4000 images of open and closed hands under varying skin tones and lighting conditions and with differing backgrounds were captured to accumulate a training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network. \\ \\
+Training for subsequent object recognition was performed using the Keras library for Python. Over 7000 images of open and closed hands with variation of skin tones and lighting conditions and with differing backgrounds were captured to accumulate a robust training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network. \\ \\
 The images obtained were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
-The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands with over 99\% accuracy under controlled conditions.
+The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands with over 99\% accuracy under controlled conditions.\footnote{Source code in provided file \textbf{recognize.py}}
 
+\subsection{Recognition}
+The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured and then sent for processing. It is then input into the deep learning model with a batch size of 10 for classification into one of two trained states: open hand and closed hand. A prediction based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two incorrect closed hand prediction states, click events are only deployed when two or more previous frames have been predicted by the neural network to be closed-hand frames; only then is the click event deployed. \\ \\
+
+\subsection{Output}
 %------------------------------------------------
 
 \section{Results}
@@ -148,27 +151,17 @@ Richard & Miles & $2$ \\
 \end{tabular}
 \end{table}
 
-\blindtext % Dummy text
 
 \begin{equation}
 \label{eq:emc}
 e = mc^2
 \end{equation}
 
-\blindtext % Dummy text
 
 %------------------------------------------------
 
 \section{Discussion}
-
-\subsection{Subsection One}
-
 A statement requiring citation \cite{Figueredo:2009dg}.
-\blindtext % Dummy text
-
-\subsection{Subsection Two}
-
-\blindtext % Dummy text
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
