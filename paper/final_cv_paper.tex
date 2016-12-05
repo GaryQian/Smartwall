@@ -109,8 +109,8 @@ This paper presents Smartwall, a program that uses computer vision to turn any s
 We separate our discussion of methods into several subsections:
 \begin{itemize}
 \item Calibration
-\item Training
 \item Detection
+\item Training
 \item Recognition
 \item Output
 \end{itemize}
@@ -121,17 +121,24 @@ From each processed frame, contours are drawn and the center of each contour is 
 When the amount of detected points is equal to the amount of points on the custom pattern designed for optimum calibration, the points are sorted and then a homography is found to output a transformation matrix. If the pattern is not adequately detected, the system continues again for up to 13350 iterations.\\ \\
 We have found that our system accurately detects our custom pattern projected onto a flat white background in less than 10 iterations, or frames, even with the camera positioned at various angles.\footnote{Example footnote}.
 
+\subsection{Detection}
+For successful object detection by the camera, 
+
+\subsection{Training}
+Training for subsequent object recognition was performed using the Keras library for Python. Over 4000 training images of open and closed hands under varying skin tones and lighting conditions and with differing backgrounds were captured. They were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
+The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands.
+
 %------------------------------------------------
 
 \section{Results}
 
 \begin{table}
-\caption{Example table}
+\caption{Number of Iterations}
 \centering
 \begin{tabular}{llr}
 \toprule
-\multicolumn{2}{c}{Name} \\
-\cmidrule(r){1-2}
+%\multicolumn{2}{c}{Name} \\
+%\cmidrule(r){1-2}
 First name & Last Name & Grade \\
 \midrule
 John & Doe & $7.5$ \\
