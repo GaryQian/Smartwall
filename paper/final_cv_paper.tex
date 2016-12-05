@@ -129,38 +129,41 @@ The images obtained were trained against using a deep convolutional neural netwo
 The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands with over 99\% accuracy under controlled conditions.\footnote{Source code in provided file \textbf{recognize.py}}
 
 \subsection{Recognition}
-The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured and then sent for processing. It is then input into the deep learning model with a batch size of 10 for classification into one of two trained states: open hand and closed hand. A prediction based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two incorrect closed hand prediction states, click events are only deployed when two or more previous frames have been predicted by the neural network to be closed-hand frames; only then is the click event deployed. \\ \\
+The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured and then sent for processing. It is then input into the deep learning model with a batch size of 10 for classification into one of two trained states: open hand and closed hand. A prediction based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two incorrect closed hand prediction states, click events are only deployed when two or more previous frames have been predicted by the neural network to be closed-hand frames. Only then is the click event deployed by the system. \footnote{Source code provided in file \textbf{display.py}}\\ \\
 
 \subsection{Output}
-%------------------------------------------------
+Open hand gestures are mapped by the system to non-click pointer movement events, and closed hand gestures are mapped to click pointer events. A drawing system where one can draw onto the screen only upon closed-hand events is built into the system for demonstration purposes. Additionally, a system for controlling the machine running the program using mouse events is also built into the SmartWall system.
+ %------------------------------------------------
 
 \section{Results}
+The system proved successful in a variety of environments under both daylight and nighttime lighting conditions. Our system performed better under conditions with fluorescent, or true-white light, rather than those with incandescent, or tinted-light sources, due to the algorithm used for color value thresholding. \\ \\Initial training runs for gestural prediction were performed on a simple convolutional neural network with 3 layers achieving 83\% prediction accuracy. When a larger, "deep" convolutional neural network with increasing amount of feature maps were employed, hand gestures were recognized with over 95\% accuracy.
 
-\begin{table}
-\caption{Number of Iterations}
-\centering
-\begin{tabular}{llr}
-\toprule
+%\begin{table}
+%\caption{Number of Iterations}
+%\centering
+%\begin{tabular}{llr}
+%\toprule
 %\multicolumn{2}{c}{Name} \\
 %\cmidrule(r){1-2}
-First name & Last Name & Grade \\
-\midrule
-John & Doe & $7.5$ \\
-Richard & Miles & $2$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+%First name & Last Name & Grade \\
+%\midrule
+%John & Doe & $7.5$ \\
+%Richard & Miles & $2$ \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 
 
-\begin{equation}
-\label{eq:emc}
-e = mc^2
-\end{equation}
+%\begin{equation}
+%\label{eq:emc}
+%e = mc^2
+%\end{equation}
 
 
 %------------------------------------------------
 
 \section{Discussion}
+Future steps for research on object recognition using a camera and projector include dynamic color thresholding that uses white balance to account for different lighting conditions. Additionally, support for different color markers (currently, SmartWall only supports green) can be built into the system. Eventually, gathering more training data to recognize hands without the need for initial color object detection coupled with background subtraction algorithms for increased robustness can be integrated into the system to allow for drawing that does not require colored markers of any sort for initial detection before recognition algorithms are applied.\\ \\
 A statement requiring citation \cite{Figueredo:2009dg}.
 
 %----------------------------------------------------------------------------------------
