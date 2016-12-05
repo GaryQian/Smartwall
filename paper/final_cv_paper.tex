@@ -68,7 +68,7 @@
 
 \pretitle{\begin{center}\Huge\bfseries} % Article title formatting
 \posttitle{\end{center}} % Article title closing formatting
-\title{Smartwall} % Article title
+\title{SmartWall} % Article title
 \author{%
 \textsc{Gary Qian, Manyu Sharma, Tony Jiang, Sarah Sukardi}\\[1ex] % Your name
 \normalsize Johns Hopkins University, Department of Computer Science \\ % Your institution
@@ -105,20 +105,21 @@ This paper presents Smartwall, a program that uses computer vision to turn any s
 %------------------------------------------------
 \section{Methods}
 
-\subsection{Subsection One}
-Maecenas sed ultricies felis. Sed imperdiet dictum arcu a egestas. 
+\subsection{Overview}
+We separate our discussion of methods into several subsections:
 \begin{itemize}
-\item Donec dolor arcu, rutrum id molestie in, viverra sed diam
-\item Curabitur feugiat
-\item turpis sed auctor facilisis
-\item arcu eros accumsan lorem, at posuere mi diam sit amet tortor
-\item Fusce fermentum, mi sit amet euismod rutrum
-\item sem lorem molestie diam, iaculis aliquet sapien tortor non nisi
-\item Pellentesque bibendum pretium aliquet
+\item Calibration
+\item Training
+\item Detection
+\item Recognition
+\item Output
 \end{itemize}
-\blindtext % Dummy text
-
-Text requiring further explanation\footnote{Example footnote}.
+\subsection{Calibration}
+For camera calibration, the camera used to track hand movement is set to point towards the wall. The projector also projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin.\\ \\
+The camera then begins the process of calibration. Frames are captured in real-time from the camera, and then applied with a box blur with an 11-pixel radius. Each frame is then converted to HSV color-space to detect hues on the screen. The range of color to be detected is then defined in HSV and thresholded to retrieve only the desired values. Finally, the thresholded mask is eroded to remove noise.\\ \\
+From each processed frame, contours are drawn and the center of each contour is computed, with nearby pixels within a 30-pixel radius clustered to form a single point. The amount of detected points is then gathered from the image. \\ \\
+When the amount of detected points is equal to the amount of points on the custom pattern designed for optimum calibration, the points are sorted and then a homography is found to output a transformation matrix. If the pattern is not adequately detected, the system continues again for up to 13350 iterations.\\ \\
+We have found that our system accurately detects our custom pattern projected onto a flat white background in less than 10 iterations, or frames, even with the camera positioned at various angles.\footnote{Example footnote}.
 
 %------------------------------------------------
 
