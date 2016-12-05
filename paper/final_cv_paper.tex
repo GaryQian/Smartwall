@@ -40,6 +40,10 @@
 \setlist[itemize]{noitemsep} % Make itemize lists more compact
 
 \usepackage{abstract} % Allows abstract customization
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
 \renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
 \renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
 
@@ -124,7 +128,14 @@ We have found that our system accurately detects our custom pattern projected on
 After camera calibration has occurred, the program switches into real-time capture mode for object detection. After a frame captured real-time is converted to HSV, thresholded, eroded, contoured, and filtered to remove unwanted detections (similar to the rudimentary algorithm used for initial object detection), the colored point detected is transformed using the projective transformation found during the process of camera calibration to find the corresponding location on the screen.\\ \\ Once the location of the detected point in both camera and world coordinates has been found, a point can be directly output onto the screen in the location of the detected point, or the point can be sent for further processing and image recognition. \footnote{Source code in provided file \textbf{display.py}}
 
 \subsection{Training}
-Training for subsequent object recognition was performed using the Keras library for Python. Over 7000 images of open and closed hands with variation of skin tones and lighting conditions and with differing backgrounds were captured to accumulate a robust training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network. \\ \\
+Training for subsequent object recognition was performed using the Keras library for Python. Over 7000 images of open and closed hands with variation of skin tones and lighting conditions and with differing backgrounds were captured to accumulate a robust training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network. \\
+
+\begin{center}
+\includegraphics[scale=0.25]{training_data} \\
+\vspace{0.25cm}
+\small{\textbf{Figure 1: } \textit{Custom Training Data}}
+\end{center}
+
 The images obtained were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
 The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands with over 99\% accuracy under controlled conditions.\footnote{Source code in provided file \textbf{recognize.py}}
 
@@ -164,7 +175,7 @@ The system proved successful in a variety of environments under both daylight an
 
 \section{Discussion}
 Future steps for research on object recognition using a camera and projector include dynamic color thresholding that uses white balance to account for different lighting conditions. Additionally, support for different color markers (currently, SmartWall only supports green) can be built into the system. Eventually, gathering more training data to recognize hands without the need for initial color object detection coupled with background subtraction algorithms for increased robustness can be integrated into the system to allow for drawing that does not require colored markers of any sort for initial detection before recognition algorithms are applied.\\ \\
-A statement requiring citation \cite{Figueredo:2009dg}.
+%A statement requiring citation \cite{Figueredo:2009dg}.
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
