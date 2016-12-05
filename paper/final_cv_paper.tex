@@ -125,8 +125,9 @@ We have found that our system accurately detects our custom pattern projected on
 For successful object detection by the camera, 
 
 \subsection{Training}
-Training for subsequent object recognition was performed using the Keras library for Python. Over 4000 training images of open and closed hands under varying skin tones and lighting conditions and with differing backgrounds were captured. They were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
-The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands.
+Training for subsequent object recognition was performed using the Keras library for Python. Over 4000 images of open and closed hands under varying skin tones and lighting conditions and with differing backgrounds were captured to accumulate a training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network. \\ \\
+The images obtained were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
+The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands with over 99\% accuracy under controlled conditions.
 
 %------------------------------------------------
 
@@ -182,12 +183,6 @@ Figueredo, A.~J. and Wolf, P. S.~A. (2009).
   study.
 \newblock {\em Human Nature}, 20:317--330.
  
- %item 2
- \bibitem[Figueredo and Wolf, 2009]{Figueredo:2009dg}
- Figueredo, A.~J. and Wolf, P. S.~A. (2009).
- \newblock Assortative pairing and life history strategy - a cross-cultural
- study.
- \newblock {\em Human Nature}, 20:317--330.
 \end{thebibliography}
 
 %----------------------------------------------------------------------------------------
