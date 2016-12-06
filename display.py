@@ -12,7 +12,7 @@ from keras.models import load_model
 from keras.models import Sequential
 
 def display(projDim, cap, transform, dp):
-	training = True
+	training = False
 	manualOffset = (-6, 0)
 	counter = pickle.load(open("counter.dat", "rb"))
 	
