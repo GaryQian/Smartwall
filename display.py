@@ -27,7 +27,7 @@ def display(projDim, cap, transform, dp):
 	#Deep learing vars#
 	###################
 	model = load_model('model3deep.dat')
-	pastGestures = deque([0, 0, 0, 0, 0])
+	pastGestures = deque([0, 0, 0])
 	currentGesture = 0
 	###################
 	while(True):
@@ -106,7 +106,7 @@ def display(projDim, cap, transform, dp):
 					pastGestures.append(prediction)
 					pastGestures.popleft()
 					temp = currentGesture
-					if (pastGestures.count(0) >= 3):
+					if (pastGestures.count(0) >= 2):
 						if (currentGesture == 1):
 							currentGesture = 0
 							win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
