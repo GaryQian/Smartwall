@@ -36,7 +36,7 @@ def draw_hsv(flow):
 def draw_mask(flow):
     mask = cv2.cvtColor(draw_hsv(flow), cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
-    mask = cv2.erode(mask, np.ones((3, 3)), iterations=5)
+    mask = cv2.erode(mask, np.ones((3, 3)), iterations=7)
     mask = cv2.dilate(mask, np.ones((3, 3)), iterations=20)
     return mask
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     while True:
         ret, img = cam.read()
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        flow = cv2.calcOpticalFlowFarneback(prevgray, gray, 0.5, 3, 15, 3, 5, 1.2, 0)
+        flow = cv2.calcOpticalFlowFarneback(prevgray, gray, 0.5, 3, 7, 3, 5, 1.2, 0)
         prevgray = gray
         
         cv2.imshow('flow', draw_flow(gray, flow))
