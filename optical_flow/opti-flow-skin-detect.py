@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 import video
 
+min_YCrCb = np.array([0,133,77],np.uint8)
+max_YCrCb = np.array([255,173,127],np.uint8)
+
 help_message = '''
 USAGE: opt_flow.py [<video_source>]
 Keys:
@@ -33,11 +36,48 @@ def draw_hsv(flow):
     bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
     return bgr
 
-def draw_mask(flow):
+def draw_mask(flow, orig):
     mask = cv2.cvtColor(draw_hsv(flow), cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
     mask = cv2.erode(mask, np.ones((3, 3)), iterations=7)
     mask = cv2.dilate(mask, np.ones((3, 3)), iterations=20)
+    mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+    mask = (mask / 255) * orig
+
+    # Convert image to YCrCb
+    image = cv2.cvtColor(mask,cv2.COLOR_BGR2YCR_CB)
+
+    # Find region with skin tone in YCrCb image
+    skinRegion = cv2.inRange(image,min_YCrCb,max_YCrCb)
+    #skinRegion = cv2.inRange(image, min_RGB, max_RGB)
+    # Do contour detection on skin region
+    contours, hierarchy = cv2.findContours(skinRegion, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Draw the contour on the source image
+
+    count = 0
+
+    for i, c in enumerate(contours):
+        area = cv2.contourArea(c)
+        x,y,w,h = cv2.boundingRect(c)
+        w_over_h = w / h
+        h_over_w = h / w
+        extent = area / (w * h)
+        if area > 1000 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
+            count += 1
+            M = cv2.moments(c)
+            cX = int(M["m10"] / M["m00"])
+            cY = int(M["m01"] / M["m00"])
+            cv2.drawContours(mask, contours, i, (0, 255, 0), 3)
+            cv2.circle(mask, (cX, cY), 7, (0, 0, 255), -1)
+        # elif area > 50:
+        #     count += 1
+        #     M = cv2.moments(c)
+        #     if M["m00"] > 0:
+        #         cX = int(M["m10"] / M["m00"])
+        #         cY = int(M["m01"] / M["m00"])
+        #         cv2.circle(mask, (cX, cY), 7, (0, 0, 255), -1)
+        #     cv2.drawContours(mask, contours, i, (0, 0, 255), 3)
+
     return mask
 
 def warp_flow(img, flow):
@@ -68,7 +108,7 @@ if __name__ == '__main__':
         prevgray = gray
         
         cv2.imshow('flow', draw_flow(gray, flow))
-        cv2.imshow('mask', draw_mask(flow))
+        cv2.imshow('mask', draw_mask(flow, img))
         if show_hsv:
             cv2.imshow('flow HSV', draw_hsv(flow))
         if show_glitch:
