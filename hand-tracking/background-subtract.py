@@ -27,10 +27,10 @@ while(True):
     image = cv2.cvtColor(fgmask,cv2.COLOR_BGR2YCR_CB)
 
     # Find region with skin tone in YCrCb image
-    # skinRegion = cv2.inRange(imageYCrCb,min_YCrCb,max_YCrCb)
-    skinRegion2 = cv2.inRange(image, min_RGB, max_RGB)
+    skinRegion = cv2.inRange(image,min_YCrCb,max_YCrCb)
+    #skinRegion = cv2.inRange(image, min_RGB, max_RGB)
     # Do contour detection on skin region
-    contours, hierarchy = cv2.findContours(skinRegion2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(skinRegion, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # Draw the contour on the source image
 
     count = 0
@@ -41,13 +41,23 @@ while(True):
         w_over_h = w / h
         h_over_w = h / w
         extent = area / (w * h)
-        if area > 100 and area < 1500 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
+        if area > 100 and area < 4500 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
             count += 1
             M = cv2.moments(c)
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
             cv2.drawContours(fgmask, contours, i, (0, 255, 0), 3)
             cv2.circle(fgmask, (cX, cY), 7, (0, 0, 255), -1)
+        elif area > 50:
+            count += 1
+            M = cv2.moments(c)
+            if M["m00"] > 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                cv2.circle(fgmask, (cX, cY), 7, (0, 0, 255), -1)
+            cv2.drawContours(fgmask, contours, i, (0, 0, 255), 3)
+            
+
     print count
 
     cv2.imshow('frame',fgmask)

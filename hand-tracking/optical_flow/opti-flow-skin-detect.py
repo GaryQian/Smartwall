@@ -62,7 +62,7 @@ def draw_mask(flow, orig):
         w_over_h = w / h
         h_over_w = h / w
         extent = area / (w * h)
-        if area > 1000 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
+        if area > 300 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
             count += 1
             M = cv2.moments(c)
             cX = int(M["m10"] / M["m00"])
