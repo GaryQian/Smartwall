@@ -36,8 +36,8 @@ def draw_hsv(flow):
 def draw_mask(flow):
     mask = cv2.cvtColor(draw_hsv(flow), cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
-    mask = cv2.erode(mask, (3, 3), iterations=30)
-    mask = cv2.dilate(mask, (3, 3), iterations=50)
+    mask = cv2.erode(mask, np.ones((3, 3)), iterations=5)
+    mask = cv2.dilate(mask, np.ones((3, 3)), iterations=20)
     return mask
 
 def warp_flow(img, flow):
