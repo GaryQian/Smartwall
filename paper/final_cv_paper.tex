@@ -118,7 +118,14 @@ We separate our discussion of methods into several subsections:
 \item Output
 \end{itemize}
 \subsection{Calibration}
-For camera calibration, the camera used to track hand movement is set to point towards the wall. The projector also projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin.\\ \\
+For camera calibration, the camera used to track hand movement is set to point towards the wall. The projector also projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin.
+
+\begin{center}
+	\includegraphics[scale=0.12]{calibrationMatrix} \\
+	\vspace{0.1cm}
+	\small{\textbf{Figure 1: } \textit{Custom Calibration Matrix}}
+\end{center}
+
 The camera then begins the process of calibration. Frames are captured in real-time from the camera, and then a box blur with an 11-pixel radius is applied to the image. Each frame is then converted to HSV color-space to detect hues on the screen. The range of color to be detected is then defined in HSV and thresholded to retrieve only the desired values. Finally, the thresholded mask is eroded to remove noise.\\ \\
 From each processed frame, contours are drawn and the center of each contour is computed, with any nearby pixels within a 30-pixel radius clustered to form a single point. The amount of detected points is then gathered from the image. \\ \\
 When the amount of detected points is equal to the amount of points on the custom pattern designed for optimum calibration, the points are sorted and then a homography is found to output a transformation matrix. If the pattern is not adequately detected, the system continues again for up to 13350 iterations.\\ \\
@@ -133,7 +140,7 @@ Training for subsequent object recognition was performed using the Keras library
 \begin{center}
 \includegraphics[scale=0.25]{training_data} \\
 \vspace{0.25cm}
-\small{\textbf{Figure 1: } \textit{Custom Training Data}}
+\small{\textbf{Figure 2: } \textit{Custom Training Data}}
 \end{center}
 
 The images obtained were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
@@ -143,11 +150,18 @@ The network topology was defined in Keras and the model trained using 100 epochs
 The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured and then sent for processing. It is then input into the deep learning model with a batch size of 10 for classification into one of two trained states: open hand and closed hand. A prediction based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two incorrect closed hand prediction states, click events are only deployed when two or more previous frames have been predicted by the neural network to be closed-hand frames. Only then is the click event deployed by the system. \footnote{Source code provided in file \textbf{display.py}}\\ \\
 
 \subsection{Output}
+
+\begin{center}
+	\includegraphics[scale=0.19]{sample} \\
+	\vspace{0.25cm}
+	\small{\textbf{Figure 3: } \textit{Sample Drawing Made with SmartWall}}
+\end{center}
+
 Open hand gestures are mapped by the system to non-click pointer movement events, and closed hand gestures are mapped to click pointer events. A drawing system where one can draw onto the screen only upon closed-hand events is built into the system for demonstration purposes. Additionally, a system for controlling the machine running the program using mouse events is also built into the SmartWall system.
  %------------------------------------------------
 
 \section{Results}
-The system proved successful in a variety of environments under both daylight and nighttime lighting conditions. Our system performed better under conditions with fluorescent, or true-white light, rather than those with incandescent, or tinted-light sources, due to the algorithm used for color value thresholding. \\ \\Initial training runs for gestural prediction were performed on a simple convolutional neural network with 3 layers achieving 83\% prediction accuracy. When a larger, "deep" convolutional neural network with increasing amount of feature maps were employed, hand gestures were recognized with over 95\% accuracy.
+The system proved successful in a variety of environments under both daylight and nighttime lighting conditions. Our system performed better under conditions with fluorescent, or true-white light, rather than those with incandescent, or tinted-light sources, due to the algorithm used for color value thresholding. \\ \\Initial training runs for gestural prediction were performed on a simple convolutional neural network with 3 layers achieving 83\% prediction accuracy. When a larger, "deep" convolutional neural network with increasing amount of feature maps were employed, hand gestures were recognized with over 99.8\% accuracy.
 
 %\begin{table}
 %\caption{Number of Iterations}
