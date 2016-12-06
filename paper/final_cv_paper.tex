@@ -118,12 +118,19 @@ We separate our discussion of methods into several subsections:
 \item Output
 \end{itemize}
 \subsection{Calibration}
+
+\begin{center}
+	\includegraphics[scale=0.19]{setup} \\
+	\vspace{0.25cm}
+	\small{\textbf{Figure 1:} \textit{Sample Setup with Camera and Projector}}
+\end{center}
+
 For camera calibration, the camera used to track hand movement is set to point towards the wall. The projector also projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin.
 
 \begin{center}
 	\includegraphics[scale=0.12]{calibrationMatrix} \\
 	\vspace{0.1cm}
-	\small{\textbf{Figure 1: } \textit{Custom Calibration Matrix}}
+	\small{\textbf{Figure 2:} \textit{Custom Calibration Matrix}}
 \end{center}
 
 The camera then begins the process of calibration. Frames are captured in real-time from the camera, and then a box blur with an 11-pixel radius is applied to the image. Each frame is then converted to HSV color-space to detect hues on the screen. The range of color to be detected is then defined in HSV and thresholded to retrieve only the desired values. Finally, the thresholded mask is eroded to remove noise.\\ \\
@@ -135,26 +142,26 @@ We have found that our system accurately detects our custom pattern projected on
 After camera calibration has occurred, the program switches into real-time capture mode for object detection. After a frame captured real-time is converted to HSV, thresholded, eroded, contoured, and filtered to remove unwanted detections (similar to the rudimentary algorithm used for initial object detection), the colored point detected is transformed using the projective transformation found during the process of camera calibration to find the corresponding location on the screen.\\ \\ Once the location of the detected point in both camera and world coordinates has been found, a point can be directly output onto the screen in the location of the detected point, or the point can be sent for further processing and image recognition. \footnote{Source code in provided file \textbf{display.py}}
 
 \subsection{Training}
-Training for subsequent object recognition was performed using the Keras library for Python. Over 7000 images of open and closed hands with variation of skin tones and lighting conditions and with differing backgrounds were captured to accumulate a robust training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network. \\
+Training for subsequent object recognition was performed using the Keras library for Python. Over 7000 images of open and closed hands with variation of skin tones and lighting conditions and with differing backgrounds were captured to accumulate a robust training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed programmatically onto the hand to allow for different color recognition and color-agnostic training by the neural network.
 
 \begin{center}
 \includegraphics[scale=0.25]{training_data} \\
 \vspace{0.25cm}
-\small{\textbf{Figure 2: } \textit{Custom Training Data}}
+\small{\textbf{Figure 3:} \textit{Custom Training Data}}
 \end{center}
 
 The images obtained were trained against using a deep convolutional neural network, using a pattern of Convolutional, Dropout, Convolutional, and Max Pooling layers repeated 3 times with 32, 64, and 128 feature maps. Finally, a larger Dense layer was used at the output of the convolutional neural network to more efficaciously translate the large number of feature maps to class values. \\ \\
 The network topology was defined in Keras and the model trained using 100 epochs and a batch size of 32. This training allowed for subsequent object recognition of open and closed hands with over 99\% accuracy under controlled conditions.\footnote{Source code in provided file \textbf{recognize.py}}
 
 \subsection{Recognition}
-The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured and then sent for processing. It is then input into the deep learning model with a batch size of 10 for classification into one of two trained states: open hand and closed hand. A prediction based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two incorrect closed hand prediction states, click events are only deployed when two or more previous frames have been predicted by the neural network to be closed-hand frames. Only then is the click event deployed by the system. \footnote{Source code provided in file \textbf{display.py}}\\ \\
+%The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured and then sent for processing. It is then input into the deep learning model with a batch size of 10 for classification into one of two trained states: open hand and closed hand. A prediction based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two incorrect closed hand prediction states, click events are only deployed when two or more previous frames have been predicted by the neural network to be closed-hand frames. Only then is the click event deployed by the system. \footnote{Source code provided in file \textbf{display.py}}
 
 \subsection{Output}
 
 \begin{center}
 	\includegraphics[scale=0.19]{sample} \\
 	\vspace{0.25cm}
-	\small{\textbf{Figure 3: } \textit{Sample Drawing Made with SmartWall}}
+	\small{\textbf{Figure 4:} \textit{Sample Drawing Made with SmartWall}}
 \end{center}
 
 Open hand gestures are mapped by the system to non-click pointer movement events, and closed hand gestures are mapped to click pointer events. A drawing system where one can draw onto the screen only upon closed-hand events is built into the system for demonstration purposes. Additionally, a system for controlling the machine running the program using mouse events is also built into the SmartWall system.
