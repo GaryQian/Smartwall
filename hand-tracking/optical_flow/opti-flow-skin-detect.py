@@ -40,7 +40,7 @@ def draw_mask(flow, orig):
     mask = cv2.cvtColor(draw_hsv(flow), cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
     mask = cv2.erode(mask, np.ones((3, 3)), iterations=7)
-    mask = cv2.dilate(mask, np.ones((3, 3)), iterations=20)
+    mask = cv2.dilate(mask, np.ones((3, 3)), iterations=12)
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     mask = (mask / 255) * orig
 

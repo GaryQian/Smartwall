@@ -12,11 +12,19 @@ min_RGB = np.array([130, 100, 0], np.uint8)
 max_RGB = np.array([255, 223, 196], np.uint8)
 
 subtractor = cv2.BackgroundSubtractorMOG2(history=100, varThreshold=5.0)
+#subtractor = cv2.BackgroundSubtractorMOG()
+
+lastCount = 0
 
 while(True):
+    learningRate = 0.001
+
+    if lastCount > 50:
+        learningRate = 0.01
+
     ret, frame = cap.read()
 
-    fgmask = subtractor.apply(frame, learningRate=0.005)
+    fgmask = subtractor.apply(frame, learningRate=learningRate)
     fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
 
     fgmask = cv2.cvtColor(fgmask, cv2.COLOR_GRAY2BGR);
@@ -57,7 +65,7 @@ while(True):
                 cv2.circle(fgmask, (cX, cY), 7, (0, 0, 255), -1)
             cv2.drawContours(fgmask, contours, i, (0, 0, 255), 3)
             
-
+    lastCount = count
     print count
 
     cv2.imshow('frame',fgmask)
