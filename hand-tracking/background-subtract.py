@@ -19,7 +19,7 @@ lastCount = 0
 while(True):
     learningRate = 0.001
 
-    if lastCount > 50:
+    if lastCount > 15:
         learningRate = 0.01
 
     ret, frame = cap.read()
