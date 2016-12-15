@@ -105,7 +105,7 @@ This paper presents Smartwall, a program that uses computer vision to turn any s
 
 \section{Introduction}
 
-\lettrine[nindent=0em,lines=3]{H} umans have drawn on surfaces for millenia. From primitive pre-historic cave paintings to 17th century frescoes to the chalkboards and whiteboards commonly used in schools and universities today, the usage of surfaces as conduits for brainstorming, depicting information, and even art, have made them long essential to processes of creativity and conveyance.\\ \\Current, modern approaches to drawing on surfaces suffer from either requiring physical, depletable media (whiteboards, chalkboards, pens, paint) or expensive equipment (modern-day smartboards, MSRP ~\$1000 - \$9000). This paper presents a cost-effective method to turn any wall into a drawable surface (and more generally, full computer control) using only two pieces of equipment: a camera and a projector, where the projector can be substituted with any medium capable of displaying digital content (ie. televisions, monitors, etc.). The camera requirement can be filled by readily available webcams present on almost all modern laptops.\\ \\ Our method is easily adaptable to spaces with unique constraints and requires equipment that most modern rooms already come equipped with, combining both traditional as well as state-of-the art computer vision techniques to allow for sophisticated and accurate gestural recognition.
+\lettrine[nindent=0em,lines=3]{H} umans have drawn on surfaces for millenia. From primitive pre-historic cave paintings to 17th century frescoes to the chalkboards and whiteboards commonly used in schools and universities today, the usage of surfaces as conduits for brainstorming, depicting information, and even art, have made them long essential to processes of creativity and conveyance.\\ \\Current, modern approaches to drawing on surfaces suffer from either requiring physical, depletable media (whiteboards, chalkboards, pens, paint) or expensive equipment (modern-day smartboards, MSRP ~\$1000 - \$9000). This paper presents a cost-effective method to turn any wall into a drawable surface (and more generally, a surface on which one can execute full control of one's computer using only gestures) using only two pieces of equipment: a camera and a projector, where the projector can be substituted with any medium capable of displaying digital content (ie. televisions, monitors, etc.). The camera requirement can be filled by readily available webcams present on almost all modern laptops.\\ \\ Our method is easily adaptable to spaces with unique constraints and requires equipment that most modern rooms already come equipped with, combining both traditional as well as state-of-the art computer vision techniques to allow for sophisticated and accurate gestural recognition.
 %------------------------------------------------
 \section{Methods}
 
@@ -145,7 +145,7 @@ After camera calibration has occurred, the program switches into real-time captu
 Training for subsequent object recognition was performed using the Keras library for Python. Over 7000 images of open and closed hands with variation of skin tones and lighting conditions and with differing backgrounds were captured to accumulate a robust training data set. In captured images, a green square with optimal hue for camera calibration was placed onto the hand; a red dot was then superimposed through software onto the hand to allow for different color recognition and color-agnostic training by the neural network by simply covering up the green patch. Each training image consisted of a 32x32 image. The sample space depends on the resolution of the camera. For example, for a 640x480 webcam, the 32x32 image is created by down-sampling a 64x64 area on the webcam image. For smaller screens, the area represented can be dynamically adjusted. One of the primary reasons we chose such a small resolution was because we had to ensure that the system remained very fast to allow for real-time processing. Since Smartwall is interactive, any latency would be immediately noticeable. We ensured a delay in the training image capture rate to ensure that each image was sufficiently different from the previous image. The training image capture system is built into our display.py smartwall system and can be turned on by changing the boolean `training' to true. This allows for the training data collection system to be the same as the system used to collect real-time detection data.
 
 \begin{center}
-\includegraphics[scale=0.25]{training_data} \\
+\includegraphics[scale=0.27]{training_data} \\
 \vspace{0.25cm}
 \small{\textbf{Figure 3:} \textit{Custom Training Data}}
 \end{center}
@@ -169,7 +169,7 @@ Closed to Open hand gesture transitions are mapped by the system to mouse button
  %------------------------------------------------
 
 \section{Results}
-The system proved successful in a variety of environments under both daylight and nighttime lighting conditions. Our system performed better under conditions with fluorescent, or true-white light, rather than those with incandescent, or tinted-light sources, due to the algorithm used for color value thresholding. \\ \\Initial training runs for gestural prediction were performed on a simple convolutional neural network with 3 layers achieving 83\% prediction accuracy. When a larger, "deep" convolutional neural network with increasing amount of feature maps were employed, hand gestures were recognized with over 99.8\% accuracy.
+The system proved successful in a variety of environments under both daylight and nighttime lighting conditions. Our system performed better under conditions with fluorescent, or true-white light, rather than those with incandescent, or tinted-light sources, due to the algorithm used for color value thresholding. \\ \\Initial training runs for gestural prediction were performed on a simple convolutional neural network with 3 layers achieving 87\% prediction accuracy. With this performance we were able to achieve reasonable click accuracy with a buffer of 5 frames, although this led to some latency. When a larger, "deep" convolutional neural network with increasing amount of feature maps was employed, hand gestures were recognized with over 99.8\% accuracy. 
 
 %\begin{table}
 %\caption{Number of Iterations}
@@ -196,7 +196,7 @@ The system proved successful in a variety of environments under both daylight an
 %------------------------------------------------
 
 \section{Discussion}
-In this project, we developed a simple system to intuitively control a computer that is projected or displayed a large screen using hand gestures. The traditional and expensive hardware requirements are avoided using computer vision techniques, which has the added features of ease of use, easy deployment to any situation, and extremely low cost.\\ \\ Future steps for research on object recognition using a camera and projector include dynamic color thresholding that uses white balance to account for different lighting conditions. Additionally, support for different color markers (currently, SmartWall only supports green) can be built into the system. Eventually, gathering more training data to recognize hands without the need for initial color object detection coupled with background subtraction algorithms for increased robustness can be integrated into the system to allow for drawing that does not require colored markers of any sort for initial detection before recognition algorithms are applied.\\ \\
+In this project, we developed a simple system to intuitively control a computer that is projected or displayed a large screen using hand gestures. The traditional and expensive hardware requirements are avoided using computer vision techniques, which has the added features of ease of use, easy deployment to any situation, and extremely low cost.\\ \\ Future steps for research on object recognition using a camera and projector include dynamic color thresholding that uses white balance to account for different lighting conditions. Additionally, support for different color markers (currently, SmartWall only supports green) can be built into the system. Eventually, gathering more training data to recognize hands without the need for initial color object detection coupled with background subtraction algorithms for increased robustness can be integrated into the system to allow for drawing that does not require colored markers of any sort for initial detection before recognition algorithms are applied.\\
 %A statement requiring citation \cite{Figueredo:2009dg}.
 
 %----------------------------------------------------------------------------------------
@@ -206,12 +206,13 @@ In this project, we developed a simple system to intuitively control a computer 
 \begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
 
 %item 1
-\bibitem[Figueredo and Wolf, 2009]{Figueredo:2009dg}
-Figueredo, A.~J. and Wolf, P. S.~A. (2009).
-\newblock Assortative pairing and life history strategy - a cross-cultural
-  study.
-\newblock {\em Human Nature}, 20:317--330.
- 
+\bibitem[Belongie et. Al, 2002]{Belongie:2002} Belongie, Serge, Jitendra Malik, and Jan Puzicha. "Shape Matching and Object Recognition Using Shape Contexts." \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence} 24.4 (2002): 509-22.
+\newblock \bibitem[Basilio et. Al, 2011]{Basilio:2011dg}Basilio, Jorge Alberto Marcial, Gualberto Aguilar Torres, Gabriel Sanchez Perez, Karina Toscano Medina, and Hector Perez Meana. "Explicit Image Detection Using YCbCr Space Color Model as Skin Detection." \textit{Applications of Mathematics and Computer Engineering} (2011): 123-28.
+\newblock \bibitem[Horn and Schunck, 1981]{Horn:1981dg} Horn, Berthold K.p., and Brian G. Schunck. "Determining Optical Flow." \textit{Artificial Intelligence} 17.1-3 (1981): 185-203.
+\newblock \bibitem[Mikolajczyk et. Al, 2004]{Mikolajczyk:2004dg} Mikolajczyk, Krystian, and Cordelia Schmid. "Scale \& Affine Invariant Interest Point Detectors." \textit{International Journal of Computer Vision} 60.1 (2004): 63-86. 
+\newblock \bibitem[Shi, 1994]{Shi:1994dg} Shi, Jianbo. "Good 
+Features to Track." \textit{Proceedings of IEEE Conference on Computer Vision and Pattern Recognition} CVPR-94 (1994).
+
 \end{thebibliography}
 
 %----------------------------------------------------------------------------------------
