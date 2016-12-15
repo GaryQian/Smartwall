@@ -125,7 +125,8 @@ We separate our discussion of methods into several subsections:
 	\small{\textbf{Figure 1:} \textit{Sample Setup with Camera and Projector}}
 \end{center}
 
-For camera calibration, the camera used to track hand movement is set to point towards the wall. Note: we will proceed to use the phrase projector to represent any display medium from TV screens to actual projectors. The projector projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin. The pattern we found that worked the best was 9 green dots arranged in a x pattern as shown. This pattern results in full coverage of the extremities of the projected screen, ensuring capture of any strange warping effects. Each dot has a unique x position, which will be used later to sort and match the detected dots with their expected locations. Also, each dot's position and size is relative to the projector resolution, ensuring compatibility with a projector of any size and resolution. This method will work under the assumption that the projection surface will be flat and fully visible to the camera.
+For camera calibration, the camera used to track hand movement is set to point towards the wall. Note: we will proceed to use the phrase projector to represent any display medium from TV screens to actual projectors. The projector projects the content eventually to be controlled with a human hand in the same direction as the camera. A custom pattern of green dots is displayed onto the wall for the camera to record; this is the setup required for the camera calibration process to begin. \\ \\
+The pattern we found that worked the best was 9 green dots arranged in a x pattern as shown. This pattern results in full coverage of the extremities of the projected screen, ensuring capture of any strange warping effects. Each dot has a unique x position, which will be used later to sort and match the detected dots with their expected locations. Also, each dot's position and size is relative to the projector resolution, ensuring compatibility with a projector of any size and resolution. This method will work under the assumption that the projection surface will be flat and fully visible to the camera.
 
 \begin{center}
 	\includegraphics[scale=0.12]{calibrationMatrix} \\
@@ -158,15 +159,39 @@ In our first implementation, we utilize color detection to find the location of 
 We used the same algorithm/system used in the calibration step to detect the hand color patch. One of the differences was that the blurring radius used was 9 pixels instead of 11 because the green patch is generally smaller than the calibration dots. The process of object recognition begins when one point (and only one point) has been detected by the system in real-time. This requirement is enforced due the technical limitation that windows computers only register one mouse pointer. If implemented on a device such as a tablet with multi-touch support, multiple points can easily be captured. When only one colored point has been detected, a 32 x 32 pixel window around the detected point is captured (in the same way as the training data) and then sent for processing. This window can be dynamically adjusted based on the resolution of the It is then input into the deep learning model for classification into one of two trained states: open hand and closed hand. A prediction is generated based on the two output probabilities into one of the two states. \\ \\ To prevent erroneous click events from one or two stray incorrect closed hand prediction states, click events are only sent when two or more previous frames have been predicted by the neural network to be closed-hand frames. This is implemented by retaining a 3 frame buffer, where the majority state (in this case, 2) will determine the current prediction. Only then is the click event deployed by the system. Through experimentation, we found that our classification system was accurate enough that a minimal buffer of 3 was enough to eliminate almost all erroneous clicks while keeping latency down. \footnote{Source code provided in file \textbf{display.py}}
 
 \subsection{Output}
+Closed to Open hand gesture transitions are mapped by the system to mouse button up events, and opend to closed hand gesture transitions are mapped to mouse button down events. A drawing system where one can draw onto the screen only upon closed-hand events is built into the system for demonstration purposes. Additionally, a system for controlling the machine running the program using mouse events is also built into the SmartWall system. This system provides the fundamental functionality of what is known as a smartboard of full computer mouse control.
 
 \begin{center}
-	\includegraphics[scale=0.19]{sample} \\
+	\includegraphics[scale=0.13]{demo_highlight} \\
 	\vspace{0.25cm}
-	\small{\textbf{Figure 4:} \textit{Sample Drawing Made with SmartWall}}
+	\small{\textbf{Figure 4:} \textit{Drawing from Live Class Demo, with Line by Professor Highlighted in Yellow}}
 \end{center}
 
-Closed to Open hand gesture transitions are mapped by the system to mouse button up events, and opend to closed hand gesture transitions are mapped to mouse button down events. A drawing system where one can draw onto the screen only upon closed-hand events is built into the system for demonstration purposes. Additionally, a system for controlling the machine running the program using mouse events is also built into the SmartWall system. This system provides the fundamental functionality of what is known as a smartboard of full computer mouse control.
  %------------------------------------------------
+
+\section{Additional Methods}
+\subsection{Markerless Hand Tracking}
+Our stretch goal for this project was to be able to recognize and track hands without having to rely on our green target markers. We were not able to implement this in time for our demo, however, we were able to eventually implement this functionality using a background subtractor coupled with a skin tone segmentation algorithm. \\ \\
+The first step in our algorithm involved using a background subtractor to remove all static pixels from the video feed. This method does not infringe on other aspects of our design, as we already require our camera to be stationary during use. The background subtractor is set to "learn" relatively slowly, so as long as users are not completely stationary in front of the camera, the subtractor will be able to work as desired. \\ \\
+The next step involves converting the remaining colors to YCrCb color space. We do this in order to better identify skin-tone colored regions from non skin-tone colored regions, and find contours around all skin-tone colored regions. We apply area constraints on these regions to rule out areas that are too large (such as skin-tone colored clothing) or small (backgrond noise) to be a hand. Finally, we removed regions that had extreme aspect ratios (long lines), as those were almost never hands. We also modified the background subtractor's learning rate based on the number of skintone regions found in the scene. Idealy, the background subtractor will have a low learning rate so that the user won't be subtracted out of the frame, but in the case that too many skin-tone regions were found, we would temporarily increase learning rate to remove static skin-tone regions from the frame.\\ \\
+Finally, we output the result of our program in real time. The following is one of our ideal outputs from our program:\\
+
+\begin{center}
+	\includegraphics[scale=0.12]{hand_tracking_1} \\
+	\vspace{0.25cm}
+	\small{\textbf{Figure 5:} \textit{Camera Input}}
+	\end{center}
+
+\begin{center}
+	\includegraphics[scale=0.25]{hand_tracking_2} \\
+	\vspace{0.25cm}
+	\small{\textbf{Figure 6:} \textit{Output of Markerless Hand Tracking Algorithm}}
+\end{center}
+
+
+In order to integrate this with our system, we would have to add a third prediction for our deep learning model, which would be "not a hand". Getting training data for this would not be difficult, as we could easily collect thousands of 32x32 frames from our camera that are not hands. Once the model is re-trained, we would use the product as normal, and our model input would change from a 32x32 frame around the green target to a 32x32 frame around the center of detected contours from markerless hand tracker. It would only take action if it detected a single open or closed hand, otherwise, it would do nothing. Since our deep learning model has been extremely accurate up until now, we see no reason to believe it would not work after adding a third prediction.\\ \\
+One of the issues we faced with this method is that it requires the user to not wear short sleeves, since the skin regions detected would include the arm. To solve this, the user could wear a watch or thick bracelet to segment the hand from the arm. A more advanced solution would involve using a body segmentation algorithm that could extract the skeleton of a user on camera similar to those outputted by kinect sensors. However, this may not be very easy to implement using just a single webcam. \\ \\
+To conclude, we feel that our markerless hand tracking algorithm is a good foundation to begin tracking hands without markers, however, there are many edge cases faced in testing that would need to be controlled for such as short sleeves, skin colored clothing, shadows from strange lighting, and issues with users who stand still too long. However, in the face of these issues, we have achieved good control outputs in the perfect conditions.
 
 \section{Results}
 The system proved successful in a variety of environments under both daylight and nighttime lighting conditions. Our system performed better under conditions with fluorescent, or true-white light, rather than those with incandescent, or tinted-light sources, due to the algorithm used for color value thresholding. \\ \\Initial training runs for gestural prediction were performed on a simple convolutional neural network with 3 layers achieving 87\% prediction accuracy. With this performance we were able to achieve reasonable click accuracy with a buffer of 5 frames, although this led to some latency. When a larger, "deep" convolutional neural network with increasing amount of feature maps was employed, hand gestures were recognized with over 99.8\% accuracy. 
