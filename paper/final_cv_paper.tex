@@ -88,7 +88,7 @@
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
 \noindent 
-This paper presents Smartwall, a program that uses computer vision to turn any surface into an interactive board using a standard camera (such as a webcam) and a projector. The program uses a custom calibration matrix and perspective projection to enable object tracking, as well as employs deep learning for hand recognition and gestural board manipulation. Smartwall is an extremely accurate, cost-effective, and simple way to facilitate interactive teaching, brainstorming, and entertainment, at a fraction of the cost of other existing devices.
+This paper presents Smartwall, a program that uses computer vision to turn any flat surface into an interactive board using a standard camera (such as a webcam) and a projector or large display. The program uses a custom calibration matrix and perspective projection to enable object tracking, and employs deep learning for hand recognition and gestural board manipulation all in real time. Smartwall is an extremely accurate, cost-effective, and simple way to facilitate interactive teaching, brainstorming, and entertainment, at a fraction of the cost of other existing devices.
 \end{abstract}
 }
 
@@ -136,6 +136,7 @@ For camera calibration, the camera used to track hand movement is set to point t
 The camera then begins the process of calibration. Frames are captured in real-time from the camera, and then a box blur with an 11-pixel radius is applied to the image. Each frame is then converted to HSV color-space to detect hues on the screen. The range of color to be detected is then defined in HSV and thresholded to retrieve only the desired values. Finally, the thresholded mask is eroded to remove noise.\\ \\
 From each processed frame, contours are drawn and the center of each contour is computed, with any nearby pixels within a 30-pixel radius clustered to form a single point. The amount of detected points is then gathered from the image. \\ \\
 When the amount of detected points is equal to the amount of points on the custom pattern designed for optimum calibration, the points are sorted and then a homography is found to output a transformation matrix. If the pattern is not adequately detected, the system continues again for up to 13350 iterations.\\ \\
+Camera calibration allows us to know where located objects are in relation to the screen. This is extremely crucial for our solution, as our system must draw at the exact spot where the user places their hand.\\ \\
 We have found that our system accurately detects our custom pattern projected onto a flat white background in less than 10 iterations, or frames, even with the camera positioned at various angles.\footnote{Source code in provided file \textbf{calibrate.py}.}.
 
 \subsection{Detection}
