@@ -17,7 +17,7 @@ subtractor = cv2.BackgroundSubtractorMOG2(history=100, varThreshold=5.0)
 lastCount = 0
 
 while(True):
-    learningRate = 0.001
+    learningRate = 0.0005
 
     if lastCount > 15:
         learningRate = 0.01
@@ -49,7 +49,7 @@ while(True):
         w_over_h = w / h
         h_over_w = h / w
         extent = area / (w * h)
-        if area > 100 and area < 4500 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
+        if area > 20 and area < 3000 and w_over_h < 4 and h_over_w < 4 and extent > 0.25:
             count += 1
             M = cv2.moments(c)
             cX = int(M["m10"] / M["m00"])
