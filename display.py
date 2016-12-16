@@ -123,7 +123,7 @@ def display(projDim, cap, transform, dp):
 				elif (window != None):
 					#Write training data
 					if (attempt % 5 == 0):
-						cv2.imwrite('trainingData2/0/img' + str(counter) + '.png', window)
+						cv2.imwrite('trainingData/0/img' + str(counter) + '.png', window)
 						print counter
 						counter += 1
 						pickle.dump(counter, open( "counter.dat", "wb" ))
